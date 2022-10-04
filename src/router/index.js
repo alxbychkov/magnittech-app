@@ -10,8 +10,13 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/task',
+      name: 'Create task',
+      component: () => import('../views/TaskView.vue')
+    },
+    {
       path: '/task/:id',
-      name: 'task',
+      name: 'Edit task',
       component: () => import('../views/TaskView.vue')
     }
   ]
