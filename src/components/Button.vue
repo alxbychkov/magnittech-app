@@ -3,12 +3,16 @@ defineProps({
   caption: {
     type: String,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
 
 <template>
-  <button class="button">{{ caption }}</button>
+  <button class="button" :disabled="disabled">{{ caption }}</button>
 </template>
 
 <style scoped>
@@ -58,5 +62,9 @@ defineProps({
 .button.cancel::before {
   content: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik05IDAuNjY2NjU2QzEzLjYwMjQgMC42NjY2NTYgMTcuMzMzMyA0LjM5NzYyIDE3LjMzMzMgOC45OTk5OUMxNy4zMzMzIDEzLjYwMjQgMTMuNjAyNCAxNy4zMzMzIDkgMTcuMzMzM0M0LjM5NzYyIDE3LjMzMzMgMC42NjY2NjQgMTMuNjAyNCAwLjY2NjY2NCA4Ljk5OTk5QzAuNjY2NjY0IDQuMzk3NjIgNC4zOTc2MiAwLjY2NjY1NiA5IDAuNjY2NjU2Wk0xNC4yNjczIDQuOTEyODlMNC45MTI5IDE0LjI2NzNDNi4wNDE2NSAxNS4xNDQ0IDcuNDU5ODMgMTUuNjY2NyA5IDE1LjY2NjdDMTIuNjgxOSAxNS42NjY3IDE1LjY2NjcgMTIuNjgxOSAxNS42NjY3IDguOTk5OTlDMTUuNjY2NyA3LjQ1OTgyIDE1LjE0NDQgNi4wNDE2NCAxNC4yNjczIDQuOTEyODlaTTkgMi4zMzMzMkM1LjMxODEgMi4zMzMzMiAyLjMzMzMzIDUuMzE4MDkgMi4zMzMzMyA4Ljk5OTk5QzIuMzMzMzMgMTAuNTQwMiAyLjg1NTYxIDExLjk1ODMgMy43MzI3MiAxMy4wODcxTDEzLjA4NzEgMy43MzI3MkMxMS45NTgzIDIuODU1NiAxMC41NDAyIDIuMzMzMzIgOSAyLjMzMzMyWiIgZmlsbD0iIzBDMjc0NyIvPgo8L3N2Zz4K);
   top: 1px;
+}
+
+.button:disabled {
+  cursor: no-drop;
 }
 </style>

@@ -3,32 +3,44 @@ import EditIcon from "./icons/EditIcon.vue";
 import BasketIcon from "./icons/BasketIcon.vue";
 import { toDate } from "../utils/functions";
 defineProps({
+  head: {
+    type: Array,
+    default: [],
+  },
   items: {
     type: Array,
     default: [],
   },
+  actions: {
+    type: Array,
+    default: []
+  }
 });
+
+const emit = defineEmits(["onDelete"]);
+
+const deleteHandler = (id) => {
+  emit("onDelete", id);
+};
 </script>
 <template>
   <ul class="list">
     <li class="list-item list-item-head">
-      <div class="list-name list-title">Название</div>
-      <div class="list-date list-title">Дата</div>
-      <div class="list-status list-title">Статус</div>
-      <div class="list-actions"></div>
+      <div v-for="(title, index) in head" class="list-title" :class="`list-${index+1}`" :key="title">{{ title }}</div>
+      <div v-if="actions.length" class="list-actions"></div>
     </li>
 
-    <li v-for="item in items" class="list-item" :key="item._id">
-      <div class="list-name list-title">{{ item.name }}</div>
-      <div class="list-date list-title">{{ toDate(item.ends) }}</div>
-      <div class="list-status list-title">{{ item.status }}</div>
+    <li v-for="item in items" class="list-item" :key="item[0]">
+      <div v-for="(title, index) in head" class="list-title" :class="`list-${index + 1}`" :key="title">
+        {{ item[index + 1] }}
+      </div>
       <div class="list-actions">
-        <button class="btn-action">
-          <RouterLink :to="`task/${item._id}#general`" class="list-link">
+        <button v-if="actions.indexOf('edit') >= 0" class="btn-action">
+          <RouterLink :to="`task/${item[0]}#general`" class="list-link">
             <EditIcon />
           </RouterLink>
         </button>
-        <button class="btn-action">
+        <button v-if="actions.indexOf('delete') >= 0" class="btn-action" @click="deleteHandler(item[0])">
           <BasketIcon />
         </button>
       </div>
@@ -46,8 +58,9 @@ defineProps({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 25px 12px 25px 33px;
+  padding: 19px 12px 18px 33px;
 }
+
 .list-item:not(:last-child) {
   margin-bottom: 6px;
 }
@@ -57,7 +70,7 @@ defineProps({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 25px 12px 25px 33px;
+  padding: 19px 12px 18px 33px;
 }
 
 .list-title {
@@ -84,12 +97,12 @@ defineProps({
   cursor: pointer;
 }
 
-.list-name {
+.list-1 {
   width: 30%;
 }
 
-.list-status,
-.list-date {
+.list-3,
+.list-2 {
   width: 15%;
 }
 

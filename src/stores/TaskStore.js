@@ -22,7 +22,10 @@ export const useTaskStore = defineStore('taskStore', {
         async update(value) {
             try {
                 const response = await axios.put('task', value);
-                if (response.data.tasks) this.get();
+                if (response.data.tasks) {
+                    this.isLoaded = false;
+                    this.get();
+                }
             } catch (error) {
                 console.error('Error: ', error);
             }
@@ -30,7 +33,10 @@ export const useTaskStore = defineStore('taskStore', {
         async delete(value) {
             try {
                 const response = await axios.delete('task', {data: value});
-                if (response.data.deleted) this.get();
+                if (response.data.deleted) {
+                    this.isLoaded = false;
+                    this.get();
+                }
             } catch (error) {
                 console.error('Error: ', error);
             }
@@ -38,11 +44,18 @@ export const useTaskStore = defineStore('taskStore', {
         async add(value) {
             try {
                 const response = await axios.post('task', value);
-                if (response.data.task) this.get();
+                if (response.data.task) {
+                    this.get();
+                    return response.data.task._id;
+                }
             } catch (error) {
                 console.error('Error: ', error);
             }
         }
     },
-    getters: {}
+    getters: {
+        active(id) {
+            return this.tasks.filter((t) => t._id === id);
+        }
+    }
 });

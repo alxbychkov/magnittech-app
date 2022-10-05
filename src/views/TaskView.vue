@@ -1,19 +1,79 @@
 <script setup>
-import { onBeforeMount, ref } from "@vue/runtime-core";
+import { onBeforeMount, onMounted, ref, toRef, watch, watchEffect, watchPostEffect } from "@vue/runtime-core";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import Button from "../components/Button.vue";
+import { useTaskStore } from "../stores/TaskStore";
+import { toDate } from "../utils/functions";
+import GeneralTab from "../components/tabs/GeneralTab.vue";
+import Button1 from "../components/Button.vue";
+import List from "../components/List.vue";
+import FilesTab from "../components/tabs/FilesTab.vue";
 
 const STEPS = ['general', 'documents', 'comments'];
 
+const INITIAL_TASK = {
+  _id: "",
+  name: "",
+  status: "Создан",
+  description: "",
+  files: [],
+  comments: [],
+  ends: (new Date()).toLocaleDateString('fr-CA'),
+};
+
+const taskStore = useTaskStore();
+const tasks = toRef(taskStore, 'tasks');
+const isLoaded = toRef(taskStore, 'isLoaded');
+const task = ref(INITIAL_TASK);
+
 const route = useRoute();
+const router = useRouter();
 const step = ref(STEPS[0]);
 
 onBeforeMount(() => {
   if (route.hash && STEPS.includes(route.hash.slice(1)))
     step.value = route.hash.slice(1);
-
-  console.log(step.value);
 });
+
+onMounted(async () => {
+  if (tasks.value.length && route.params.id) {
+    task.value = tasks.value.find(t => t._id === route.params.id);
+    if (task.value && task.value.ends)
+      task.value.ends = toDate(task.value.ends);
+  }
+});
+
+watchPostEffect(() => {
+  if (step.value !== route.hash.slice(1))
+    step.value = route.hash.slice(1);
+});
+
+const saveHandler = async () => {
+  if (!route.params.id) {
+    const { name, ends, status, description } = { ...task.value };
+
+    task.value._id = await taskStore.add({ name, ends, status, description });
+    router.replace(`task/${task.value._id}#general`);
+  } else {
+    await taskStore.update(task.value);
+  }
+}
+
+const cancelHandler = () => {
+  router.push(`/`);
+}
+
+const nextHandler = () => {
+  const index = STEPS.indexOf(step.value) + 1;
+
+  router.push(`#${STEPS[index]}`);
+}
+
+const prevHandler = () => {
+  const index = STEPS.indexOf(step.value) - 1;
+
+  router.push(`#${STEPS[index]}`);
+}
 </script>
 <template>
   <h1 class="h1-title">Создание нового задания: {{ $route.params.id }}</h1>
@@ -23,19 +83,24 @@ onBeforeMount(() => {
         <RouterLink to="#general" class="tab-link">Основные настройки</RouterLink>
       </li>
       <li class="tab-item" :class="{active: step === 'documents', visited: STEPS.indexOf(step) > 1}">
-        <RouterLink to="#documents" class="tab-link">Документы</RouterLink>
+        <RouterLink to="#documents" class="tab-link" :class="{'no-event': !task.name}">Документы</RouterLink>
       </li>
       <li class="tab-item" :class="{active: step === 'comments', visited: STEPS.indexOf(step) > 2}">
-        <RouterLink to="#comments" class="tab-link">Комментарии</RouterLink>
+        <RouterLink to="#comments" class="tab-link" :class="{'no-event': !task.name}">Комментарии</RouterLink>
       </li>
     </ul>
   </section>
   <section class="navigation">
-    <Button caption="Назад" class="btn-white prev" />
-    <Button caption="Далее" class="btn-white next" />
+    <Button v-if="STEPS.indexOf(step) > 0" caption="Назад" class="btn-white prev" @click="prevHandler" />
+    <Button v-if="STEPS.indexOf(step) < 2" caption="Далее" class="btn-white next" @click="nextHandler"
+      :disabled="!task.name" />
     <div class="separator"></div>
-    <Button caption="Сохранить" class="btn-white save" />
-    <Button caption="Отмена" class="btn-white cancel" />
+    <Button caption="Сохранить" class="btn-white save" @click="saveHandler" :disabled="!task.name" />
+    <Button caption="Отмена" class="btn-white cancel" @click="cancelHandler" />
+  </section>
+  <section class="tabs-body">
+    <GeneralTab v-if="step === 'general'" :task="task" />
+    <FilesTab v-if="step === 'documents'" :task="task"/>
   </section>
 </template>
 
@@ -75,6 +140,10 @@ onBeforeMount(() => {
   display: block;
   padding: 18px 24px;
   color: #10151B;
+}
+
+.tab-link.no-event {
+  pointer-events: none;
 }
 
 .tab-link::before {

@@ -2,6 +2,7 @@
 import { onBeforeMount } from "vue";
 import { RouterView } from "vue-router";
 import { useTaskStore } from "./stores/TaskStore";
+import Loader from "./components/Loader.vue";
 
 const taskStore = useTaskStore();
 
@@ -11,7 +12,10 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <RouterView />
+  <Loader v-if="!taskStore.isLoaded"/>
+  <RouterView v-else/>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>
