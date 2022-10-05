@@ -24,7 +24,7 @@ defineProps({
       <div class="list-status list-title">{{ item.status }}</div>
       <div class="list-actions">
         <button class="btn-action">
-          <RouterLink :to="`task/${item._id}`" class="list-link">
+          <RouterLink :to="`task/${item._id}#general`" class="list-link">
             <EditIcon />
           </RouterLink>
         </button>

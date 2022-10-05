@@ -15,7 +15,7 @@ onMounted(() => {
 
 <template>
   <section class="header">
-    <RouterLink to="/task">
+    <RouterLink to="/task#general">
       <Button class="plus btn-blue" caption="Новое задание" />
     </RouterLink>
   </section>
