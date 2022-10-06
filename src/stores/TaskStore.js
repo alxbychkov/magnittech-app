@@ -9,6 +9,19 @@ export const useTaskStore = defineStore('taskStore', {
         }
     },
     actions: {
+        // Task = {
+        //     _id: String,
+        //     name: String,
+        //     description: String,
+        //     status: String,
+        //     ends: Date,
+        //     files: [String],
+        //     comments: [String]
+        // }
+        // 
+        // Method: GET
+        // Response: [Task]
+        // 
         async get() {
             try {
                 const response = await axios.get('task');
@@ -20,6 +33,11 @@ export const useTaskStore = defineStore('taskStore', {
                 this.isLoaded = true;
             }
         },
+        // 
+        // Method: PUT
+        // Body: Task
+        // Response: Task
+        // 
         async update(value) {
             try {
                 const response = await axios.put('task', value);
@@ -31,6 +49,11 @@ export const useTaskStore = defineStore('taskStore', {
                 this.isLoaded = true;
             }
         },
+        // 
+        // Method: DELETE
+        // Body: [_id]
+        // Response: Task
+        //         
         async delete(value) {
             try {
                 const response = await axios.delete('task', {data: value});
@@ -42,6 +65,11 @@ export const useTaskStore = defineStore('taskStore', {
                 this.isLoaded = true;
             }
         },
+        // 
+        // Method: POST
+        // Body: {name,description,status,files,comments,ends}
+        // Response: Task
+        // 
         async add(value) {
             try {
                 const response = await axios.post('task', value);
