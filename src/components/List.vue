@@ -2,6 +2,7 @@
 import EditIcon from "./icons/EditIcon.vue";
 import BasketIcon from "./icons/BasketIcon.vue";
 import { toDate } from "../utils/functions";
+import { ref } from "vue";
 defineProps({
   head: {
     type: Array,
@@ -17,11 +18,24 @@ defineProps({
   }
 });
 
+const selectedItems = ref([]);
+
 const emit = defineEmits(["onDelete"]);
 
 const deleteHandler = (id) => {
-  emit("onDelete", id);
+  if (!selectedItems.value.length) selectedItems.value.push(id);
+
+  emit("onDelete", selectedItems.value);
 };
+
+const selectItemHandler = (id) => {
+  if (selectedItems.value.indexOf(id) !== -1)
+    selectedItems.value.splice(selectedItems.value.indexOf(id), 1);
+  else
+    selectedItems.value.push(id);
+
+  console.log(selectedItems.value);
+}
 </script>
 <template>
   <ul class="list">
@@ -30,17 +44,18 @@ const deleteHandler = (id) => {
       <div v-if="actions.length" class="list-actions"></div>
     </li>
 
-    <li v-for="item in items" class="list-item" :key="item[0]">
+    <li v-for="item in items" class="list-item" :class="{selected: selectedItems.indexOf(item[0]) !== -1}"
+      :key="item[0]" @click="selectItemHandler(item[0])">
       <div v-for="(title, index) in head" class="list-title" :class="`list-${index + 1}`" :key="title">
         {{ item[index + 1] }}
       </div>
       <div class="list-actions">
         <button v-if="actions.indexOf('edit') >= 0" class="btn-action">
-          <RouterLink :to="`task/${item[0]}#general`" class="list-link">
+          <RouterLink :to="`task/${item[0]}#general`" class="list-link" @click.stop>
             <EditIcon />
           </RouterLink>
         </button>
-        <button v-if="actions.indexOf('delete') >= 0" class="btn-action" @click="deleteHandler(item[0])">
+        <button v-if="actions.indexOf('delete') >= 0" class="btn-action" @click.stop="deleteHandler(item[0])">
           <BasketIcon />
         </button>
       </div>
@@ -59,6 +74,12 @@ const deleteHandler = (id) => {
   align-items: center;
   justify-content: space-between;
   padding: 19px 12px 18px 33px;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.list-item.selected {
+  border: 1px solid #10171e;
 }
 
 .list-item:not(:last-child) {

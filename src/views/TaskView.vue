@@ -8,6 +8,7 @@ import GeneralTab from "../components/tabs/GeneralTab.vue";
 import Button1 from "../components/Button.vue";
 import List from "../components/List.vue";
 import FilesTab from "../components/tabs/FilesTab.vue";
+import CommentsTab from "../components/tabs/CommentsTab.vue";
 
 const STEPS = ['general', 'documents', 'comments'];
 
@@ -50,10 +51,10 @@ watchPostEffect(() => {
 
 const saveHandler = async () => {
   if (!route.params.id) {
-    const { name, ends, status, description } = { ...task.value };
+    const { name, ends, status, description, files, comments } = { ...task.value };
 
-    task.value._id = await taskStore.add({ name, ends, status, description });
-    router.replace(`task/${task.value._id}#general`);
+    task.value._id = await taskStore.add({ name, ends, status, description, files, comments });
+    router.replace(`task/${task.value._id}#${step.value}`);
   } else {
     await taskStore.update(task.value);
   }
@@ -76,7 +77,6 @@ const prevHandler = () => {
 }
 </script>
 <template>
-  <h1 class="h1-title">Создание нового задания: {{ $route.params.id }}</h1>
   <section class="tabs">
     <ul class="tabs-list">
       <li class="tab-item" :class="{active: step === 'general', visited: STEPS.indexOf(step) > 0}">
@@ -101,6 +101,7 @@ const prevHandler = () => {
   <section class="tabs-body">
     <GeneralTab v-if="step === 'general'" :task="task" />
     <FilesTab v-if="step === 'documents'" :task="task"/>
+    <CommentsTab v-if="step === 'comments'" :task="task"/>
   </section>
 </template>
 

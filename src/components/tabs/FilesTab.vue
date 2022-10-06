@@ -57,13 +57,16 @@ const deleteFileHandler = (id) => {
         <Button caption="Выбрать" class="btn-blue" @click="fileInputHandler" />
       </div>
     </div>
-    <div class="current-files">
+    <div v-if="task.files.length" class="current-files">
       <List
         :head="['Название']"
         :items="task.files.map((f) => JSON.parse(f))"
         @onDelete="deleteFileHandler"
         :actions="['delete']"
       />
+    </div>
+    <div v-else class="current-files">
+      <p class="no-data">Файлы к заданию отсутствуют 🙄</p>
     </div>
   </div>
 </template>

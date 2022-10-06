@@ -41,6 +41,19 @@ export const useTaskStore = defineStore('taskStore', {
                 console.error('Error: ', error);
             }
         },
+        async deleteAll(value) {
+            try {
+                this.isLoaded = false;
+
+                const response = await axios.delete('task', {data: value});
+                
+                if (response.data.deleted) {
+                    this.get();
+                }
+            } catch (error) {
+                console.error('Error: ', error);
+            }
+        },
         async add(value) {
             try {
                 const response = await axios.post('task', value);
