@@ -1,7 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue';
+import { MODAL_TYPES } from '../../config/default';
 import Button from '../Button.vue';
 import CommentItem from '../CommentItem.vue';
+import Modal from '../Modal.vue';
 
 const props = defineProps({
     task: {
@@ -13,6 +15,7 @@ const props = defineProps({
 const text = ref('');
 const editedComment = ref(null);
 const buttonCaption = ref('Добавить комментарий');
+const isShowModal = ref(false);
 
 const addCommentHandler = () => {
     const comment = {};
@@ -46,9 +49,19 @@ const editCommentHandler = (comment) => {
 }
 
 const deleteCommentHandler = (comment) => {
-    props.task.comments = [...props.task.comments.filter(c => c !== JSON.stringify(comment))];
+    editedComment.value = comment;
+    isShowModal.value = true;
 }
 
+const closeModalHandler = () => {
+  isShowModal.value = false;
+  editedComment.value = null;
+}
+
+const agreeModalHandler = () => {
+    props.task.comments = [...props.task.comments.filter(c => c !== JSON.stringify(editedComment.value))];
+    isShowModal.value = false;
+}
 </script>
 <template>
     <div class="comments">
@@ -65,6 +78,10 @@ const deleteCommentHandler = (comment) => {
             <Button :caption="buttonCaption" class="btn-blue" @click="addCommentHandler" :disabled="!text" />
         </div>
     </div>
+    <Modal v-if="isShowModal" :title="MODAL_TYPES['delete'].title" :buttons="MODAL_TYPES['delete'].buttons"
+        @close="closeModalHandler" @agree="agreeModalHandler">
+        <p>{{ MODAL_TYPES['delete'].slot[0] }}</p><br>
+    </Modal>
 </template>
 <style scoped>
 .comments {

@@ -78,6 +78,7 @@ const agreeModalHandler = async () => {
       }
       break;
     case 'cancel':
+      taskStore.get();
       router.push('/');
       task.value = {...INITIAL_TASK};
       break;

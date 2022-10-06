@@ -6,6 +6,7 @@ import { onBeforeUnmount, onMounted, onUpdated, ref, toRef } from "vue";
 import { useTaskStore } from "../stores/TaskStore";
 import { toDate } from "../utils/functions";
 import Modal from "../components/Modal.vue";
+import { MODAL_TYPES } from "../config/default.js";
 
 const taskStore = useTaskStore();
 const tasks = toRef(taskStore, "tasks");
@@ -19,11 +20,13 @@ const deleteTaskHandler = (ids) => {
 
 const closeModalHandler = () => {
   isShowModal.value = false;
+  selectedItems.value = [];
 }
 
 const agreeModalHandler = () => {
     taskStore.delete({ _id: selectedItems.value });
     isShowModal.value = false;
+    selectedItems.value = [];
 }
 
 </script>
@@ -41,10 +44,10 @@ const agreeModalHandler = () => {
   <div v-else class="body">
     <p class="no-data">В данный момент задания отсутствуют 🤡</p>
   </div>
-  <Modal v-if="isShowModal" title="Удалить выбранное ?" :buttons="['Отмена','Удалить']" @close="closeModalHandler"
+  <Modal v-if="isShowModal" :title="MODAL_TYPES['delete'].title" :buttons="MODAL_TYPES['delete'].buttons" @close="closeModalHandler"
     @agree="agreeModalHandler">
-    <p>Выбранные вами объекты удалятся без возможности восстановления.</p><br>
-    <p><b>Выбрано объектов: </b> <span style="color: #106EDC">{{ selectedItems.length }}</span></p>
+    <p>{{ MODAL_TYPES['delete'].slot[0] }}</p><br>
+    <p><b>{{ MODAL_TYPES['delete'].slot[1] }}</b> <span style="color: #106EDC">{{ selectedItems.length }}</span></p>
   </Modal>
 </template>
 

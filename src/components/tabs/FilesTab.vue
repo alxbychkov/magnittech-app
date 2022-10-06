@@ -3,6 +3,8 @@ import { ref } from "vue";
 import Button from "../Button.vue";
 import List from "../List.vue";
 import DropArea from "../DropArea.vue";
+import Modal from "../Modal.vue";
+import { MODAL_TYPES } from "../../config/default";
 
 const props = defineProps({
   task: {
@@ -12,6 +14,8 @@ const props = defineProps({
 });
 
 const file = ref();
+const isShowModal = ref(false);
+const selectedItems = ref([]);
 
 const fileInputHandler = () => {
   file.value.click();
@@ -30,13 +34,24 @@ const changeFileHandler = (value) => {
   });
 };
 
-const deleteFileHandler = (id) => {
-  console.log(id)
+const deleteFileHandler = (ids) => {
+  isShowModal.value = true;
+  selectedItems.value = [...ids];
+};
+
+const closeModalHandler = () => {
+  isShowModal.value = false;
+  selectedItems.value = [];
+}
+
+const agreeModalHandler = () => {
   const temp = props.task.files.map((f) => JSON.parse(f));
-  const filtered = temp.filter((f) => !id.includes(f[0]));
+  const filtered = temp.filter((f) => !selectedItems.value.includes(f[0]));
 
   props.task.files = filtered.map((f) => JSON.stringify(f));
-};
+  isShowModal.value = false;
+  selectedItems.value = [];
+}
 </script>
 <template>
   <div class="documents">
@@ -70,6 +85,11 @@ const deleteFileHandler = (id) => {
       <p class="no-data">Файлы к заданию отсутствуют 🙄</p>
     </div>
   </div>
+  <Modal v-if="isShowModal" :title="MODAL_TYPES['delete'].title" :buttons="MODAL_TYPES['delete'].buttons" @close="closeModalHandler"
+    @agree="agreeModalHandler">
+    <p>{{ MODAL_TYPES['delete'].slot[0] }}</p><br>
+    <p><b>{{ MODAL_TYPES['delete'].slot[1] }}</b> <span style="color: #106EDC">{{ selectedItems.length }}</span></p>
+  </Modal>
 </template>
 <style scoped>
 .documents {
