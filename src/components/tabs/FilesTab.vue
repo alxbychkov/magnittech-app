@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import Button from "../Button.vue";
 import List from "../List.vue";
+import DropArea from "../DropArea.vue";
 
 const props = defineProps({
   task: {
@@ -10,15 +11,20 @@ const props = defineProps({
   },
 });
 
-const dropFiles = ref([]);
 const file = ref();
 
 const fileInputHandler = () => {
   file.value.click();
 };
 
-const changeFileHandler = () => {
-  [...file.value.files].forEach((currentFile) => {
+const changeFileHandler = (value) => {
+  let files;
+  if (value instanceof Event) {
+    files = [...file.value.files];
+  } else {
+    files = [...value];
+  }
+  files.forEach((currentFile) => {
     const { lastModified, name } = currentFile;
     props.task.files.push(JSON.stringify([lastModified, name]));
   });
@@ -30,18 +36,11 @@ const deleteFileHandler = (id) => {
 
   props.task.files = filtered.map((f) => JSON.stringify(f));
 };
-
-onMounted(() => {});
 </script>
 <template>
   <div class="documents">
     <div class="new-files">
-      <div class="file-drop">
-        <p class="file-drop-title">Загрузить файл</p>
-        <p class="file-drop-subtitle">
-          Выберите или перетащите один или несколько файлов
-        </p>
-      </div>
+      <DropArea @onDropFiles="changeFileHandler" />
       <div class="input-item">
         <input
           type="file"
@@ -80,31 +79,6 @@ onMounted(() => {});
 
 .current-files {
   width: 40%;
-}
-
-.file-drop {
-  background: #f6f6f6;
-  border: 2px dashed #dfe3e7;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 200px;
-  font-weight: 500;
-  color: #82898f;
-  margin-bottom: 10px;
-}
-
-.file-drop-title {
-  font-size: 14px;
-  line-height: 14px;
-  margin-bottom: 6px;
-}
-
-.file-drop-subtitle {
-  font-size: 10px;
-  line-height: 13px;
 }
 
 .input-item {
