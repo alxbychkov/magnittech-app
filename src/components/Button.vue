@@ -17,8 +17,8 @@ defineProps({
 
 <style scoped>
 .button {
-  font-family: 'Geometria';
   border: none;
+  font-family: 'Geometria';
   border-radius: 6px;
   padding: 10px 14px;
   font-weight: 500;
@@ -39,6 +39,7 @@ defineProps({
 .btn-white {
   background: #FFFFFF;
   color: #0C2747;
+  border: 1px solid #DFE3E7;
 }
 .button::before {
   margin-right: 13px;

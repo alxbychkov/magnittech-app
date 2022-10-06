@@ -1,34 +1,24 @@
 <script setup>
-import { onBeforeMount, onMounted, ref, toRef, watch, watchEffect, watchPostEffect } from "@vue/runtime-core";
+import { onBeforeMount, onMounted, ref, toRef, watchPostEffect } from "@vue/runtime-core";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import Button from "../components/Button.vue";
 import { useTaskStore } from "../stores/TaskStore";
-import { toDate } from "../utils/functions";
 import GeneralTab from "../components/tabs/GeneralTab.vue";
-import Button1 from "../components/Button.vue";
 import List from "../components/List.vue";
 import FilesTab from "../components/tabs/FilesTab.vue";
 import CommentsTab from "../components/tabs/CommentsTab.vue";
+import Modal from "../components/Modal.vue";
 
-const STEPS = ['general', 'documents', 'comments'];
-
-const INITIAL_TASK = {
-  _id: "",
-  name: "",
-  status: "Создан",
-  description: "",
-  files: [],
-  comments: [],
-  ends: (new Date()).toLocaleDateString('fr-CA'),
-};
+import { toDate } from "../utils/functions.js";
+import { STEPS, INITIAL_TASK, MODAL_TYPES } from "../config/default.js";
 
 const taskStore = useTaskStore();
 const tasks = toRef(taskStore, 'tasks');
-const isLoaded = toRef(taskStore, 'isLoaded');
-const task = ref(INITIAL_TASK);
-
 const route = useRoute();
 const router = useRouter();
+const isShowModal = ref(false);
+const modalType = ref(MODAL_TYPES['cancel']);
+const task = ref({...INITIAL_TASK});
 const step = ref(STEPS[0]);
 
 onBeforeMount(() => {
@@ -49,19 +39,14 @@ watchPostEffect(() => {
     step.value = route.hash.slice(1);
 });
 
-const saveHandler = async () => {
-  if (!route.params.id) {
-    const { name, ends, status, description, files, comments } = { ...task.value };
-
-    task.value._id = await taskStore.add({ name, ends, status, description, files, comments });
-    router.replace(`task/${task.value._id}#${step.value}`);
-  } else {
-    await taskStore.update(task.value);
-  }
+const saveHandler = () => {
+  modalType.value = { ...MODAL_TYPES['save'] };
+  isShowModal.value = true;
 }
 
 const cancelHandler = () => {
-  router.push(`/`);
+  modalType.value = { ...MODAL_TYPES['cancel'] };
+  isShowModal.value = true;
 }
 
 const nextHandler = () => {
@@ -75,6 +60,32 @@ const prevHandler = () => {
 
   router.push(`#${STEPS[index]}`);
 }
+
+const closeModalHandler = () => {
+  isShowModal.value = false;
+}
+
+const agreeModalHandler = async () => {
+  switch (modalType.value.type) {
+    case 'save':
+      if (!route.params.id) {
+        const { name, ends, status, description, files, comments } = { ...task.value };
+
+        task.value._id = await taskStore.add({ name, ends, status, description, files, comments });
+        router.replace(`task/${task.value._id}#${step.value}`);
+      } else {
+        await taskStore.update(task.value);
+      }
+      break;
+    case 'cancel':
+      router.push('/');
+      task.value = {...INITIAL_TASK};
+      break;
+  }
+
+  isShowModal.value = false;
+}
+
 </script>
 <template>
   <section class="tabs">
@@ -100,9 +111,13 @@ const prevHandler = () => {
   </section>
   <section class="tabs-body">
     <GeneralTab v-if="step === 'general'" :task="task" />
-    <FilesTab v-if="step === 'documents'" :task="task"/>
-    <CommentsTab v-if="step === 'comments'" :task="task"/>
+    <FilesTab v-if="step === 'documents'" :task="task" />
+    <CommentsTab v-if="step === 'comments'" :task="task" />
   </section>
+  <Modal v-if="isShowModal" :title="modalType.title" :buttons="modalType.buttons" @close="closeModalHandler"
+    @agree="agreeModalHandler">
+    <p>{{ modalType.slot }}</p>
+  </Modal>
 </template>
 
 <style scoped>
