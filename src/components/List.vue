@@ -24,8 +24,9 @@ const emit = defineEmits(["onDelete"]);
 
 const deleteHandler = (id) => {
   if (!selectedItems.value.length) selectedItems.value.push(id);
-
   emit("onDelete", selectedItems.value);
+
+  selectedItems.value = [];
 };
 
 const selectItemHandler = (id) => {
@@ -33,8 +34,6 @@ const selectItemHandler = (id) => {
     selectedItems.value.splice(selectedItems.value.indexOf(id), 1);
   else
     selectedItems.value.push(id);
-
-  console.log(selectedItems.value);
 }
 </script>
 <template>

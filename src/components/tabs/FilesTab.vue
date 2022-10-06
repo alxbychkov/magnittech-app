@@ -31,8 +31,9 @@ const changeFileHandler = (value) => {
 };
 
 const deleteFileHandler = (id) => {
+  console.log(id)
   const temp = props.task.files.map((f) => JSON.parse(f));
-  const filtered = temp.filter((f) => f[0] !== id);
+  const filtered = temp.filter((f) => !id.includes(f[0]));
 
   props.task.files = filtered.map((f) => JSON.stringify(f));
 };

@@ -2,23 +2,16 @@
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import List from "../components/List.vue";
 import Button from "../components/Button.vue";
-import { onMounted, toRef } from "vue";
+import { onBeforeUnmount, onMounted, onUpdated, ref, toRef } from "vue";
 import { useTaskStore } from "../stores/TaskStore";
 import { toDate } from "../utils/functions";
 
 const taskStore = useTaskStore();
 const tasks = toRef(taskStore, "tasks");
-const taskList = tasks.value.map(t => [t._id, t.name, toDate(t.ends), t.status]);
 
 const deleteTaskHandler = (ids) => {
-  console.log(ids);
-  if (ids.length === 1)
-    taskStore.delete({ _id: ids[0] });
-  else
-    taskStore.deleteAll({ _id: id });
+  taskStore.delete({ _id: ids });
 }
-
-onMounted(() => { });
 </script>
 
 <template>
@@ -27,8 +20,8 @@ onMounted(() => { });
       <Button class="plus btn-blue" caption="Новое задание" />
     </RouterLink>
   </section>
-  <section v-if="taskList.length" class="body">
-    <List :head="['Название','Дата','Статус']" :items="taskList" @onDelete="deleteTaskHandler"
+  <section v-if="tasks.length" class="body">
+    <List :head="['Название','Дата','Статус']" :items="tasks.map(t => [t._id, t.name, toDate(t.ends), t.status])" @onDelete="deleteTaskHandler"
       :actions="['edit', 'delete']" />
   </section>
   <div v-else class="body">

@@ -39,19 +39,8 @@ export const useTaskStore = defineStore('taskStore', {
                 }
             } catch (error) {
                 console.error('Error: ', error);
-            }
-        },
-        async deleteAll(value) {
-            try {
-                this.isLoaded = false;
-
-                const response = await axios.delete('task', {data: value});
-                
-                if (response.data.deleted) {
-                    this.get();
-                }
-            } catch (error) {
-                console.error('Error: ', error);
+            } finally {
+                this.isLoaded = true;
             }
         },
         async add(value) {
