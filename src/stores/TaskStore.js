@@ -20,7 +20,7 @@ export const useTaskStore = defineStore('taskStore', {
         // }
         // 
         // Method: GET
-        // Response: [Task]
+        // Response: { tasks: [Task], message: '', status: '' }
         // 
         async get() {
             try {
@@ -36,7 +36,7 @@ export const useTaskStore = defineStore('taskStore', {
         // 
         // Method: PUT
         // Body: Task
-        // Response: Task
+        // Response: { task: Task, message: '', status: '' }
         // 
         async update(value) {
             try {
@@ -52,7 +52,10 @@ export const useTaskStore = defineStore('taskStore', {
         // 
         // Method: DELETE
         // Body: [_id]
-        // Response: Task
+        // Response: {
+        //  deleted: {acknowledged: true, deletedCount: 1},
+        //  message: '',
+        //  status: '' }
         //         
         async delete(value) {
             try {
@@ -68,7 +71,7 @@ export const useTaskStore = defineStore('taskStore', {
         // 
         // Method: POST
         // Body: {name,description,status,files,comments,ends}
-        // Response: Task
+        // Response: { task: Task, message: '', status: '' }
         // 
         async add(value) {
             try {
